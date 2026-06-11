@@ -29,6 +29,20 @@
       "when": 1781208072363,
       "tag": "0003_furry_rocket_raccoon",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1781215508758,
+      "tag": "0004_known_morlun",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1781219159330,
+      "tag": "0005_soft_runaways",
+      "breakpoints": true
     }
   ]
 }

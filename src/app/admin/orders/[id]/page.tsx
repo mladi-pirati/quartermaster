@@ -17,11 +17,12 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { OrderStatusSelect } from '@/components/admin/order-status-select'
+import { OrderPaidToggle } from '@/components/admin/order-paid-toggle'
 import { eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { formatPrice } from '@/lib/format'
 import Link from 'next/link'
-import { ArrowLeftIcon } from 'lucide-react'
+import { ArrowLeftIcon, FileTextIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default async function OrderDetailPage({
@@ -71,6 +72,10 @@ export default async function OrderDetailPage({
           <span className="sr-only">Back</span>
         </Button>
         <h1 className="text-xl font-semibold">Order {order.id.slice(0, 8)}…</h1>
+        <Button variant="outline" size="sm" render={<a href={`/api/admin/orders/${order.id}/predracun`} target="_blank" rel="noopener noreferrer" />} nativeButton={false}>
+          <FileTextIcon />
+          Predračun
+        </Button>
         <Badge variant="secondary" className="ml-auto">
           {new Date(order.createdAt).toLocaleDateString('sl-SI')}
         </Badge>
@@ -102,8 +107,7 @@ export default async function OrderDetailPage({
                       <CardTitle>Shipping method</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <span className="font-medium">{shippingOption.name}</span>{' '}
-                      <span className="text-muted-foreground">({shippingOption.estimatedDeliveryTime})</span>
+                      <span className="font-medium">{shippingOption.name}</span>
                     </CardContent>
                   </Card>
                 )}
@@ -134,7 +138,17 @@ export default async function OrderDetailPage({
         {/* Status */}
         <div className="flex flex-col gap-3">
           <h2 className="text-sm font-medium text-muted-foreground">Status</h2>
-          <OrderStatusSelect orderId={order.id} currentStatus={order.status} />
+          <OrderStatusSelect
+            orderId={order.id}
+            currentStatus={order.status}
+            deliveryType={order.deliveryType}
+          />
+        </div>
+
+        {/* Payment */}
+        <div className="flex flex-col gap-3">
+          <h2 className="text-sm font-medium text-muted-foreground">Payment</h2>
+          <OrderPaidToggle orderId={order.id} isPaid={order.isPaid} />
         </div>
 
         {/* Notes */}

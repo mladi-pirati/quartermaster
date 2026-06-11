@@ -38,7 +38,6 @@ interface ShippingOptionManagerProps {
 
 interface OptionFormValues {
   name: string
-  estimatedDeliveryTime: string
   price: number
 }
 
@@ -52,9 +51,6 @@ function ShippingOptionForm({
   loading: boolean
 }) {
   const [name, setName] = useState(defaultValues?.name ?? '')
-  const [estimatedDeliveryTime, setEstimatedDeliveryTime] = useState(
-    defaultValues?.estimatedDeliveryTime ?? '',
-  )
   const [priceInput, setPriceInput] = useState(
     defaultValues ? String(defaultValues.price / 100) : '',
   )
@@ -63,7 +59,6 @@ function ShippingOptionForm({
     e.preventDefault()
     await onSubmit({
       name: name.trim(),
-      estimatedDeliveryTime: estimatedDeliveryTime.trim(),
       price: parsePriceInput(priceInput),
     })
   }
@@ -77,16 +72,6 @@ function ShippingOptionForm({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g. Standard Shipping"
-          required
-        />
-      </div>
-      <div className="flex flex-col gap-1.5">
-        <Label htmlFor="opt-delivery-time">Estimated Delivery Time</Label>
-        <Input
-          id="opt-delivery-time"
-          value={estimatedDeliveryTime}
-          onChange={(e) => setEstimatedDeliveryTime(e.target.value)}
-          placeholder="e.g. 2–3 business days"
           required
         />
       </div>
@@ -192,7 +177,6 @@ export function ShippingOptionManager({ initialOptions }: ShippingOptionManagerP
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Est. Delivery</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Active</TableHead>
               <TableHead className="w-20" />
@@ -202,9 +186,6 @@ export function ShippingOptionManager({ initialOptions }: ShippingOptionManagerP
             {options.map((option) => (
               <TableRow key={option.id}>
                 <TableCell className="font-medium">{option.name}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {option.estimatedDeliveryTime}
-                </TableCell>
                 <TableCell className="text-muted-foreground">
                   {formatPrice(option.price)}
                 </TableCell>
@@ -237,7 +218,6 @@ export function ShippingOptionManager({ initialOptions }: ShippingOptionManagerP
                         <ShippingOptionForm
                           defaultValues={{
                             name: option.name,
-                            estimatedDeliveryTime: option.estimatedDeliveryTime,
                             price: option.price,
                           }}
                           onSubmit={handleUpdate}

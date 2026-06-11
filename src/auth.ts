@@ -66,7 +66,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const helm = await getHelm(account.access_token);
         const user = await helm.user.me();
         return user.applications.some(
-          (a) => a.keycloakClientId === process.env.KEYCLOAK_CLIENT_ID,
+          (a: { keycloakClientId: string }) => a.keycloakClientId === process.env.KEYCLOAK_CLIENT_ID,
         );
       } catch {
         return false;

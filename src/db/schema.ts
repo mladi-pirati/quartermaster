@@ -16,9 +16,10 @@ export const itemStatusEnum = pgEnum('item_status', [
 
 export const orderStatusEnum = pgEnum('order_status', [
   'pending',
-  'confirmed',
+  'preparing',
   'shipped',
-  'completed',
+  'ready_for_pickup',
+  'complete',
   'cancelled',
 ])
 
@@ -66,7 +67,6 @@ export const pickupLocations = pgTable('pickup_locations', {
 export const shippingOptions = pgTable('shipping_options', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
-  estimatedDeliveryTime: text('estimated_delivery_time').notNull(),
   price: integer('price').notNull(),
   isActive: boolean('is_active').notNull().default(true),
   createdAt: timestamp('created_at').defaultNow().notNull(),
@@ -95,7 +95,11 @@ export const orders = pgTable('orders', {
     { onDelete: 'set null' },
   ),
   status: orderStatusEnum('status').notNull().default('pending'),
+  isPaid: boolean('is_paid').notNull().default(false),
   notes: text('notes'),
+  invoiceNumber: text('invoice_number'),
+  invoiceIssuedAt: timestamp('invoice_issued_at'),
+  invoiceDueAt: timestamp('invoice_due_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -121,6 +125,11 @@ export const rateLimitWindows = pgTable('rate_limit_windows', {
   windowStart: timestamp('window_start').defaultNow().notNull(),
 })
 
+export const invoiceCounters = pgTable('invoice_counters', {
+  year: integer('year').primaryKey(),
+  lastNumber: integer('last_number').notNull().default(0),
+})
+
 export type Item = typeof items.$inferSelect
 export type NewItem = typeof items.$inferInsert
 export type ItemImage = typeof itemImages.$inferSelect
@@ -128,3 +137,4 @@ export type PickupLocation = typeof pickupLocations.$inferSelect
 export type ShippingOption = typeof shippingOptions.$inferSelect
 export type Order = typeof orders.$inferSelect
 export type OrderItem = typeof orderItems.$inferSelect
+export type InvoiceCounter = typeof invoiceCounters.$inferSelect

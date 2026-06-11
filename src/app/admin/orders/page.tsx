@@ -1,11 +1,9 @@
 import { db } from '@/db'
 import { orders } from '@/db/schema'
+import { ALL_STATUSES, type OrderStatus } from '@/lib/order-status'
 import { OrdersStatusFilter } from '@/components/admin/orders-status-filter'
 import { OrdersDataTable } from '@/components/admin/orders-data-table'
 import { desc } from 'drizzle-orm'
-
-const ALL_STATUSES = ['pending', 'confirmed', 'shipped', 'completed', 'cancelled'] as const
-type OrderStatus = (typeof ALL_STATUSES)[number]
 
 export default async function OrdersPage({
   searchParams,

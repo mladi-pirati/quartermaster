@@ -8,9 +8,10 @@ import { z } from 'zod'
 
 const statusSchema = z.enum([
   'pending',
-  'confirmed',
+  'preparing',
   'shipped',
-  'completed',
+  'ready_for_pickup',
+  'complete',
   'cancelled',
 ])
 
@@ -26,6 +27,18 @@ export async function updateOrderStatus(
   const [order] = await db
     .update(orders)
     .set({ status: parsed.data })
+    .where(eq(orders.id, orderId))
+    .returning()
+
+  revalidatePath('/admin/orders')
+  revalidatePath(`/admin/orders/${orderId}`)
+  return { success: true as const, data: order }
+}
+
+export async function updateOrderPaymentStatus(orderId: string, isPaid: boolean) {
+  const [order] = await db
+    .update(orders)
+    .set({ isPaid })
     .where(eq(orders.id, orderId))
     .returning()
 

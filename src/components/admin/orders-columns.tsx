@@ -8,13 +8,23 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import type { Order } from '@/db/schema'
 
-type OrderStatus = 'pending' | 'confirmed' | 'shipped' | 'completed' | 'cancelled'
+type OrderStatus = 'pending' | 'preparing' | 'shipped' | 'ready_for_pickup' | 'complete' | 'cancelled'
+
+const STATUS_LABELS: Record<OrderStatus, string> = {
+  pending: 'Pending',
+  preparing: 'Preparing',
+  shipped: 'Shipped',
+  ready_for_pickup: 'Ready for Pickup',
+  complete: 'Complete',
+  cancelled: 'Cancelled',
+}
 
 const statusVariant: Record<OrderStatus, 'default' | 'secondary' | 'outline' | 'destructive'> = {
   pending: 'secondary',
-  confirmed: 'default',
+  preparing: 'default',
   shipped: 'outline',
-  completed: 'default',
+  ready_for_pickup: 'outline',
+  complete: 'default',
   cancelled: 'destructive',
 }
 
@@ -72,9 +82,21 @@ export const ordersColumns: ColumnDef<Order>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => <SortableHeader column={column} label="Status" />,
+    cell: ({ row }) => {
+      const status = row.original.status as OrderStatus
+      return (
+        <Badge variant={statusVariant[status]}>
+          {STATUS_LABELS[status]}
+        </Badge>
+      )
+    },
+  },
+  {
+    accessorKey: 'isPaid',
+    header: 'Payment',
     cell: ({ row }) => (
-      <Badge variant={statusVariant[row.original.status as OrderStatus]} className="capitalize">
-        {row.original.status}
+      <Badge variant={row.original.isPaid ? 'default' : 'secondary'}>
+        {row.original.isPaid ? 'Paid' : 'Unpaid'}
       </Badge>
     ),
   },

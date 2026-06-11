@@ -8,7 +8,6 @@ import { z } from 'zod'
 
 const shippingOptionSchema = z.object({
   name: z.string().min(1, 'Name is required'),
-  estimatedDeliveryTime: z.string().min(1, 'Estimated delivery time is required'),
   price: z.number().int().min(0, 'Price must be non-negative'),
 })
 

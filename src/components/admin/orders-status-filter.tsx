@@ -8,8 +8,8 @@ import {
   SelectTrigger,
 } from '@/components/ui/select'
 
-const ALL_STATUSES = ['pending', 'confirmed', 'shipped', 'completed', 'cancelled'] as const
-type OrderStatus = (typeof ALL_STATUSES)[number]
+import { ALL_STATUSES, STATUS_LABELS, type OrderStatus } from '@/lib/order-status'
+export { ALL_STATUSES, type OrderStatus }
 
 type StatusCounts = Record<OrderStatus | 'all', number>
 
@@ -30,18 +30,19 @@ export function OrdersStatusFilter({
     }
   }
 
+  const triggerLabel =
+    value === 'all'
+      ? `All (${counts.all})`
+      : `${STATUS_LABELS[value]} (${counts[value]})`
+
   return (
     <Select value={value} onValueChange={handleChange}>
-      <SelectTrigger>
-        {value === 'all'
-          ? `All (${counts.all})`
-          : `${value.charAt(0).toUpperCase() + value.slice(1)} (${counts[value]})`}
-      </SelectTrigger>
+      <SelectTrigger>{triggerLabel}</SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All ({counts.all})</SelectItem>
         {ALL_STATUSES.map((s) => (
           <SelectItem key={s} value={s}>
-            {s.charAt(0).toUpperCase() + s.slice(1)} ({counts[s]})
+            {STATUS_LABELS[s]} ({counts[s]})
           </SelectItem>
         ))}
       </SelectContent>

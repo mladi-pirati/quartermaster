@@ -8,7 +8,6 @@ export async function GET() {
     .select({
       id: shippingOptions.id,
       name: shippingOptions.name,
-      estimatedDeliveryTime: shippingOptions.estimatedDeliveryTime,
       price: shippingOptions.price,
     })
     .from(shippingOptions)

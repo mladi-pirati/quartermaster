@@ -1,6 +1,11 @@
+import type { Metadata } from "next"
 import { Geist, JetBrains_Mono } from "next/font/google"
 
 import "./globals.css"
+
+export const metadata: Metadata = {
+  title: "Mladi Pirati - Quartermaster",
+}
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { cn } from "@/lib/utils"
