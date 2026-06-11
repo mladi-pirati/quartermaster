@@ -1,7 +1,7 @@
 'use client'
 
 import { cn } from '@/lib/utils'
-import { PackageIcon, ShoppingBagIcon, MapPinIcon } from 'lucide-react'
+import { PackageIcon, ShoppingBagIcon, MapPinIcon, TruckIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -9,6 +9,7 @@ const navItems = [
   { href: '/admin/items', label: 'Items', icon: PackageIcon },
   { href: '/admin/orders', label: 'Orders', icon: ShoppingBagIcon },
   { href: '/admin/pickup-locations', label: 'Pickup Locations', icon: MapPinIcon },
+  { href: '/admin/shipping-options', label: 'Shipping Options', icon: TruckIcon },
 ]
 
 export function AdminNav() {

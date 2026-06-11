@@ -63,6 +63,19 @@ export const pickupLocations = pgTable('pickup_locations', {
     .$onUpdateFn(() => new Date()),
 })
 
+export const shippingOptions = pgTable('shipping_options', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull(),
+  estimatedDeliveryTime: text('estimated_delivery_time').notNull(),
+  price: integer('price').notNull(),
+  isActive: boolean('is_active').notNull().default(true),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at')
+    .defaultNow()
+    .notNull()
+    .$onUpdateFn(() => new Date()),
+})
+
 export const orders = pgTable('orders', {
   id: uuid('id').defaultRandom().primaryKey(),
   fullName: text('full_name').notNull(),
@@ -75,6 +88,10 @@ export const orders = pgTable('orders', {
   country: text('country'),
   pickupLocationId: uuid('pickup_location_id').references(
     () => pickupLocations.id,
+    { onDelete: 'set null' },
+  ),
+  shippingOptionId: uuid('shipping_option_id').references(
+    () => shippingOptions.id,
     { onDelete: 'set null' },
   ),
   status: orderStatusEnum('status').notNull().default('pending'),
@@ -108,5 +125,6 @@ export type Item = typeof items.$inferSelect
 export type NewItem = typeof items.$inferInsert
 export type ItemImage = typeof itemImages.$inferSelect
 export type PickupLocation = typeof pickupLocations.$inferSelect
+export type ShippingOption = typeof shippingOptions.$inferSelect
 export type Order = typeof orders.$inferSelect
 export type OrderItem = typeof orderItems.$inferSelect

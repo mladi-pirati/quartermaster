@@ -1,10 +1,17 @@
 import { db } from '@/db'
-import { orderItems, orders, pickupLocations } from '@/db/schema'
+import { orderItems, orders, pickupLocations, shippingOptions } from '@/db/schema'
 import { Badge } from '@/components/ui/badge'
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import {
   Table,
   TableBody,
   TableCell,
+  TableFooter,
   TableHead,
   TableHeader,
   TableRow,
@@ -46,6 +53,16 @@ export default async function OrderDetailPage({
     pickupLocation = loc ?? null
   }
 
+  let shippingOption = null
+  if (order.shippingOptionId) {
+    const [opt] = await db
+      .select()
+      .from(shippingOptions)
+      .where(eq(shippingOptions.id, order.shippingOptionId))
+      .limit(1)
+    shippingOption = opt ?? null
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center gap-3">
@@ -78,21 +95,37 @@ export default async function OrderDetailPage({
               {order.deliveryType}
             </Badge>
             {order.deliveryType === 'shipping' && (
-              <div className="mt-1 flex flex-col gap-0.5 text-muted-foreground">
-                <span>{order.address}</span>
-                <span>
-                  {order.postalCode} {order.city}
-                </span>
-                <span>{order.country}</span>
+              <div className="mt-1 flex flex-col gap-2 text-sm">
+                {shippingOption && (
+                  <Card size="sm">
+                    <CardHeader>
+                      <CardTitle>Shipping method</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <span className="font-medium">{shippingOption.name}</span>{' '}
+                      <span className="text-muted-foreground">({shippingOption.estimatedDeliveryTime})</span>
+                    </CardContent>
+                  </Card>
+                )}
+                <div className="flex flex-col gap-0.5 text-muted-foreground">
+                  <span>{order.address}</span>
+                  <span>{order.postalCode} {order.city}</span>
+                  <span>{order.country}</span>
+                </div>
               </div>
             )}
             {order.deliveryType === 'pickup' && pickupLocation && (
-              <div className="mt-1 flex flex-col gap-0.5 text-muted-foreground">
-                <span className="font-medium text-foreground">
-                  {pickupLocation.name}
-                </span>
-                <span>{pickupLocation.address}</span>
-                <span>{pickupLocation.city}</span>
+              <div className="mt-1">
+                <Card size="sm">
+                  <CardHeader>
+                    <CardTitle>Pickup location</CardTitle>
+                  </CardHeader>
+                  <CardContent className="flex flex-col gap-0.5 text-muted-foreground">
+                    <span className="font-medium text-foreground">{pickupLocation.name}</span>
+                    <span>{pickupLocation.address}</span>
+                    <span>{pickupLocation.city}</span>
+                  </CardContent>
+                </Card>
               </div>
             )}
           </div>
@@ -142,7 +175,29 @@ export default async function OrderDetailPage({
                 </TableCell>
               </TableRow>
             ))}
+            {order.deliveryType === 'shipping' && shippingOption && (
+              <TableRow>
+                <TableCell className="font-medium">Shipping ({shippingOption.name})</TableCell>
+                <TableCell />
+                <TableCell />
+                <TableCell className="text-right">{formatPrice(shippingOption.price)}</TableCell>
+                <TableCell className="text-right">{formatPrice(shippingOption.price)}</TableCell>
+              </TableRow>
+            )}
           </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TableCell colSpan={4} className="text-right text-muted-foreground">
+                Total
+              </TableCell>
+              <TableCell className="text-right">
+                {formatPrice(
+                  lineItems.reduce((sum, l) => sum + l.itemPriceSnapshot * l.quantity, 0) +
+                  (order.deliveryType === 'shipping' && shippingOption ? shippingOption.price : 0)
+                )}
+              </TableCell>
+            </TableRow>
+          </TableFooter>
         </Table>
       </div>
     </div>

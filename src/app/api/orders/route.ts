@@ -17,6 +17,7 @@ const orderSchema = z
     postalCode: z.string().optional(),
     country: z.string().optional(),
     pickupLocationId: z.string().uuid().optional(),
+    shippingOptionId: z.string().uuid().optional(),
     notes: z.string().max(500).optional(),
     captchaToken: z.string().optional(),
     items: z
@@ -36,6 +37,14 @@ const orderSchema = z
     {
       message: 'Shipping requires address, city, postal code, and country',
       path: ['address'],
+    },
+  )
+  .refine(
+    (data) =>
+      data.deliveryType !== 'shipping' || Boolean(data.shippingOptionId),
+    {
+      message: 'Shipping requires a shipping option',
+      path: ['shippingOptionId'],
     },
   )
   .refine(
@@ -95,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const itemIds = data.items.map((i) => i.itemId)
+  const itemIds = [...new Set(data.items.map((i) => i.itemId))]
   const activeItems = await db
     .select()
     .from(items)
@@ -131,6 +140,7 @@ export async function POST(request: NextRequest) {
         postalCode: data.postalCode,
         country: data.country,
         pickupLocationId: data.pickupLocationId,
+        shippingOptionId: data.shippingOptionId,
         notes: data.notes,
       })
       .returning()

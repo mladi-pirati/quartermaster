@@ -29,6 +29,7 @@ Providing a valid Cloudflare Turnstile `captchaToken` bypasses rate limiting ent
   "postalCode": "1000",
   "country": "SI",
   "pickupLocationId": null,
+  "shippingOptionId": "uuid",
   "notes": "Please pack carefully.",
   "captchaToken": "0.token...",
   "items": [
@@ -48,6 +49,7 @@ Providing a valid Cloudflare Turnstile `captchaToken` bypasses rate limiting ent
 | `postalCode` | `string` | Conditional | Required when `deliveryType` is `"shipping"`. |
 | `country` | `string` | Conditional | Required when `deliveryType` is `"shipping"`. |
 | `pickupLocationId` | `string` (UUID) | Conditional | Required when `deliveryType` is `"pickup"`. Must reference an active pickup location. |
+| `shippingOptionId` | `string` (UUID) | Conditional | Required when `deliveryType` is `"shipping"`. Must reference an active shipping option. |
 | `notes` | `string` | No | Max 500 characters. |
 | `captchaToken` | `string` | No | Cloudflare Turnstile token. Bypasses rate limiting when valid. |
 | `items` | `array` | Yes | At least 1 item required. |
