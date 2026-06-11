@@ -1,0 +1,1 @@
+ALTER TABLE "pickup_locations" ADD COLUMN "country" text NOT NULL;
