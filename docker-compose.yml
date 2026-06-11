@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: quartermaster_db
+    env_file:
+      - .env
+    ports:
+      - 5433:5432
+    volumes:
+      - quartermaster_db_data:/var/lib/postgresql
+    restart: on-failure
+
+volumes:
+  quartermaster_db_data:
