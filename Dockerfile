@@ -11,6 +11,8 @@ FROM deps AS builder
 
 COPY . .
 
+ARG RESEND_API_KEY
+
 # Some modules validate env presence during build, but runtime values still come
 # from the container environment.
 RUN DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/quartermaster \
@@ -28,6 +30,7 @@ RUN DATABASE_URL=postgres://postgres:postgres@127.0.0.1:5432/quartermaster \
     S3_ENDPOINT=https://s3.mladipirati.si \
     S3_BUCKET=quartermaster \
     NEXT_TELEMETRY_DISABLED=1 \
+    RESEND_API_KEY=$RESEND_API_KEY \
     bun run build
 
 FROM deps AS migrator
