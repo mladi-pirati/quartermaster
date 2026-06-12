@@ -55,15 +55,17 @@ export function OrderEmailLogs({ logs }: Props) {
             <Badge variant={log.status === 'sent' ? 'secondary' : 'destructive'}>
               {log.status === 'sent' ? 'Poslano' : 'Napaka'}
             </Badge>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={retrying === log.id}
-              onClick={() => handleRetry(log.id)}
-            >
-              <RefreshCwIcon className={retrying === log.id ? 'animate-spin' : ''} />
-              {log.status === 'failed' ? 'Poskusi znova' : 'Pošlji znova'}
-            </Button>
+            {log.status === 'failed' && (
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={retrying === log.id}
+                onClick={() => handleRetry(log.id)}
+              >
+                <RefreshCwIcon className={retrying === log.id ? 'animate-spin' : ''} />
+                Poskusi znova
+              </Button>
+            )}
           </div>
         </div>
       ))}
