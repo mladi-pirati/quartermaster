@@ -17,13 +17,6 @@
       "breakpoints": true
     },
     {
-      "idx": 2,
-      "version": "7",
-      "when": 1749600000000,
-      "tag": "0002_shipping_options",
-      "breakpoints": true
-    },
-    {
       "idx": 3,
       "version": "7",
       "when": 1781208072363,

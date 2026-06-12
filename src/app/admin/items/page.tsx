@@ -53,7 +53,11 @@ export default async function ItemsPage() {
           <TableBody>
             {allItems.map((item) => (
               <TableRow key={item.id}>
-                <TableCell className="font-medium">{item.name}</TableCell>
+                <TableCell className="font-medium">
+                  <Link href={`/admin/items/${item.id}`} className="hover:underline">
+                    {item.name}
+                  </Link>
+                </TableCell>
                 <TableCell>{formatPrice(item.price)}</TableCell>
                 <TableCell className="text-muted-foreground">
                   {item.sizes.length > 0 ? item.sizes.join(', ') : '—'}
