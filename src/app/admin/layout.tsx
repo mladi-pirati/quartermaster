@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { AdminNav } from '@/components/admin/admin-nav'
 import { Separator } from '@/components/ui/separator'
 
