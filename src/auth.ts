@@ -41,6 +41,7 @@ async function refreshAccessToken(refreshToken: string) {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: { signIn: "/login" },
   providers: [
@@ -65,6 +66,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       try {
         const helm = await getHelm(account.access_token);
         const user = await helm.user.me();
+        console.log("[auth] helm.user.me():", JSON.stringify(user, null, 2));
         return user.applications.some(
           (a: { keycloakClientId: string }) => a.keycloakClientId === process.env.KEYCLOAK_CLIENT_ID,
         );
