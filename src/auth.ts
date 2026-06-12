@@ -3,8 +3,6 @@ import Keycloak from "next-auth/providers/keycloak";
 import { z } from "zod";
 import { getHelm } from "@/lib/helm";
 import {
-  keycloakProfileHasClientRole,
-  keycloakAccessTokenHasClientRole,
   getKeycloakUsernameFromProfile,
   getKeycloakFullNameFromProfile,
 } from "@/lib/auth/keycloak-access";
@@ -52,25 +50,18 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ account, profile }) {
+    async signIn({ account }) {
       if (account?.provider !== "keycloak") return false;
-
-      const hasRole =
-        keycloakProfileHasClientRole(profile, process.env.KEYCLOAK_CLIENT_ID ?? "") ||
-        keycloakAccessTokenHasClientRole(
-          account.access_token,
-          process.env.KEYCLOAK_CLIENT_ID ?? "",
-        );
-      if (!hasRole) return false;
-
       try {
         const helm = await getHelm(account.access_token);
+        console.log("[auth] calling helm.user.me()");
         const user = await helm.user.me();
-        console.log("[auth] helm.user.me():", JSON.stringify(user, null, 2));
+        console.log("[auth] helm.user.me() response:", JSON.stringify(user, null, 2));
         return user.applications.some(
           (a: { keycloakClientId: string }) => a.keycloakClientId === process.env.KEYCLOAK_CLIENT_ID,
         );
-      } catch {
+      } catch (e) {
+        console.error("[auth] signIn error:", e);
         return false;
       }
     },
