@@ -1,5 +1,5 @@
 import { db } from '@/db'
-import { orderItems, orders, pickupLocations, shippingOptions } from '@/db/schema'
+import { emailLogs, orderItems, orders, pickupLocations, shippingOptions } from '@/db/schema'
 import { Badge } from '@/components/ui/badge'
 import {
   Card,
@@ -18,7 +18,8 @@ import {
 } from '@/components/ui/table'
 import { OrderStatusSelect } from '@/components/admin/order-status-select'
 import { OrderPaidToggle } from '@/components/admin/order-paid-toggle'
-import { eq } from 'drizzle-orm'
+import { OrderEmailLogs } from '@/components/admin/order-email-logs'
+import { desc, eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
 import { formatPrice } from '@/lib/format'
 import Link from 'next/link'
@@ -63,6 +64,12 @@ export default async function OrderDetailPage({
       .limit(1)
     shippingOption = opt ?? null
   }
+
+  const orderEmailLogs = await db
+    .select()
+    .from(emailLogs)
+    .where(eq(emailLogs.orderId, id))
+    .orderBy(desc(emailLogs.createdAt))
 
   return (
     <div className="flex flex-col gap-6">
@@ -158,6 +165,12 @@ export default async function OrderDetailPage({
             <p className="text-sm">{order.notes}</p>
           </div>
         )}
+      </div>
+
+      {/* Email logs */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-medium text-muted-foreground">E-pošta</h2>
+        <OrderEmailLogs logs={orderEmailLogs} />
       </div>
 
       {/* Items */}

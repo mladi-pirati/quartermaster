@@ -130,6 +130,27 @@ export const invoiceCounters = pgTable('invoice_counters', {
   lastNumber: integer('last_number').notNull().default(0),
 })
 
+export const emailTypeEnum = pgEnum('email_type', [
+  'order_confirmation',
+  'order_shipped',
+  'order_ready_for_pickup',
+])
+
+export const emailStatusEnum = pgEnum('email_status', ['sent', 'failed'])
+
+export const emailLogs = pgTable('email_logs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  orderId: uuid('order_id')
+    .notNull()
+    .references(() => orders.id, { onDelete: 'cascade' }),
+  type: emailTypeEnum('type').notNull(),
+  status: emailStatusEnum('status').notNull(),
+  subject: text('subject').notNull(),
+  resendId: text('resend_id'),
+  error: text('error'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
 export type Item = typeof items.$inferSelect
 export type NewItem = typeof items.$inferInsert
 export type ItemImage = typeof itemImages.$inferSelect
@@ -138,3 +159,4 @@ export type ShippingOption = typeof shippingOptions.$inferSelect
 export type Order = typeof orders.$inferSelect
 export type OrderItem = typeof orderItems.$inferSelect
 export type InvoiceCounter = typeof invoiceCounters.$inferSelect
+export type EmailLog = typeof emailLogs.$inferSelect

@@ -1,6 +1,7 @@
 import { db } from '@/db'
 import { invoiceCounters, items, orderItems, orders } from '@/db/schema'
 import { checkRateLimit } from '@/lib/rate-limit'
+import { sendOrderConfirmationEmail } from '@/lib/resend'
 import { verifyTurnstileToken } from '@/lib/turnstile'
 import { addDays } from 'date-fns'
 import { and, eq, inArray, sql } from 'drizzle-orm'
@@ -191,6 +192,10 @@ export async function POST(request: NextRequest) {
 
     return order
   })
+
+  sendOrderConfirmationEmail(result.id).catch((err) =>
+    console.error('[email] order confirmation failed:', err),
+  )
 
   return NextResponse.json({ orderId: result.id }, { status: 201 })
 }

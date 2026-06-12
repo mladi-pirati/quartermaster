@@ -2,6 +2,7 @@
 
 import { db } from '@/db'
 import { orders } from '@/db/schema'
+import { sendOrderStatusUpdateEmail } from '@/lib/resend'
 import { eq } from 'drizzle-orm'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
@@ -32,6 +33,17 @@ export async function updateOrderStatus(
 
   revalidatePath('/admin/orders')
   revalidatePath(`/admin/orders/${orderId}`)
+
+  if (parsed.data === 'shipped') {
+    sendOrderStatusUpdateEmail(order, 'order_shipped').catch((err) =>
+      console.error('[email] order status update failed:', err),
+    )
+  } else if (parsed.data === 'ready_for_pickup') {
+    sendOrderStatusUpdateEmail(order, 'order_ready_for_pickup').catch((err) =>
+      console.error('[email] order status update failed:', err),
+    )
+  }
+
   return { success: true as const, data: order }
 }
 
