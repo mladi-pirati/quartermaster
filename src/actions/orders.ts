@@ -42,6 +42,10 @@ export async function updateOrderStatus(
     sendOrderStatusUpdateEmail(order, 'order_ready_for_pickup').catch((err) =>
       console.error('[email] order status update failed:', err),
     )
+  } else if (parsed.data === 'cancelled') {
+    sendOrderStatusUpdateEmail(order, 'order_cancelled').catch((err) =>
+      console.error('[email] order status update failed:', err),
+    )
   }
 
   return { success: true as const, data: order }

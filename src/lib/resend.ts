@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 import { db } from '@/db'
-import { emailLogs, orderItems, orders, shippingOptions } from '@/db/schema'
-import type { Order } from '@/db/schema'
+import { emailLogs, orderItems, orders, pickupLocations, shippingOptions } from '@/db/schema'
+import type { Order, PickupLocation, ShippingOption } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { generatePredracunBuffer } from '@/lib/generate-predracun'
 import { OrderConfirmationEmail } from '@/components/emails/order-confirmation'
@@ -75,18 +75,41 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<void>
 
 export async function sendOrderStatusUpdateEmail(
   order: Order,
-  type: 'order_shipped' | 'order_ready_for_pickup',
+  type: 'order_shipped' | 'order_ready_for_pickup' | 'order_cancelled',
 ): Promise<void> {
+  let shippingOption: ShippingOption | null = null
+  let pickupLocation: PickupLocation | null = null
+
+  if (type === 'order_shipped' && order.shippingOptionId) {
+    const [opt] = await db
+      .select()
+      .from(shippingOptions)
+      .where(eq(shippingOptions.id, order.shippingOptionId))
+      .limit(1)
+    shippingOption = opt ?? null
+  }
+
+  if (type === 'order_ready_for_pickup' && order.pickupLocationId) {
+    const [loc] = await db
+      .select()
+      .from(pickupLocations)
+      .where(eq(pickupLocations.id, order.pickupLocationId))
+      .limit(1)
+    pickupLocation = loc ?? null
+  }
+
   const subject =
     type === 'order_shipped'
       ? 'Vaše naročilo je na poti'
-      : 'Vaše naročilo je pripravljeno za prevzem'
+      : type === 'order_ready_for_pickup'
+        ? 'Vaše naročilo je pripravljeno za prevzem'
+        : 'Vaše naročilo je preklicano'
 
   const { data, error } = await resend.emails.send({
     from: FROM,
     to: [order.email],
     subject,
-    react: OrderStatusUpdateEmail({ order, type }),
+    react: OrderStatusUpdateEmail({ order, type, shippingOption, pickupLocation }),
   })
 
   await logEmail({

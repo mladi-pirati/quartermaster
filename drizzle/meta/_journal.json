@@ -50,6 +50,20 @@
       "when": 1781223761759,
       "tag": "0006_happy_radioactive_man",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1781243527524,
+      "tag": "0008_nifty_orphan",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1781244443923,
+      "tag": "0008_wealthy_nico_minoru",
+      "breakpoints": true
     }
   ]
 }

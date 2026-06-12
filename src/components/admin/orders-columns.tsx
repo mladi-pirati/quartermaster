@@ -6,6 +6,7 @@ import { format } from 'date-fns'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { ResendEmailButton } from '@/components/admin/resend-email-button'
 import type { Order } from '@/db/schema'
 
 type OrderStatus = 'pending' | 'preparing' | 'shipped' | 'ready_for_pickup' | 'complete' | 'cancelled'
@@ -108,5 +109,10 @@ export const ordersColumns: ColumnDef<Order>[] = [
         {format(new Date(row.original.createdAt), 'dd. MM. yyyy')}
       </span>
     ),
+  },
+  {
+    id: 'debug',
+    header: () => <span className="text-xs text-muted-foreground">Debug</span>,
+    cell: ({ row }) => <ResendEmailButton orderId={row.original.id} />,
   },
 ]

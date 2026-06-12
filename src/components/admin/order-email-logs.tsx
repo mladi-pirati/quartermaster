@@ -13,6 +13,7 @@ const TYPE_LABELS: Record<EmailLog['type'], string> = {
   order_confirmation: 'Potrditev naročila',
   order_shipped: 'Obvestilo o odpremi',
   order_ready_for_pickup: 'Obvestilo o prevzemu',
+  order_cancelled: 'Obvestilo o preklicu',
 }
 
 interface Props {
@@ -54,17 +55,15 @@ export function OrderEmailLogs({ logs }: Props) {
             <Badge variant={log.status === 'sent' ? 'secondary' : 'destructive'}>
               {log.status === 'sent' ? 'Poslano' : 'Napaka'}
             </Badge>
-            {log.status === 'failed' && (
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={retrying === log.id}
-                onClick={() => handleRetry(log.id)}
-              >
-                <RefreshCwIcon className={retrying === log.id ? 'animate-spin' : ''} />
-                Poskusi znova
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={retrying === log.id}
+              onClick={() => handleRetry(log.id)}
+            >
+              <RefreshCwIcon className={retrying === log.id ? 'animate-spin' : ''} />
+              {log.status === 'failed' ? 'Poskusi znova' : 'Pošlji znova'}
+            </Button>
           </div>
         </div>
       ))}

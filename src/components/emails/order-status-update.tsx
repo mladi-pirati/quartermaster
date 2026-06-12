@@ -1,10 +1,12 @@
-import type { Order } from '@/db/schema'
+import type { Order, PickupLocation, ShippingOption } from '@/db/schema'
 
-type EmailType = 'order_shipped' | 'order_ready_for_pickup'
+type EmailType = 'order_shipped' | 'order_ready_for_pickup' | 'order_cancelled'
 
 interface Props {
   order: Order
   type: EmailType
+  shippingOption?: ShippingOption | null
+  pickupLocation?: PickupLocation | null
 }
 
 const BG = '#000000'
@@ -24,14 +26,21 @@ function getContent(order: Order, type: EmailType) {
       body: `Spoštovani/-a ${order.fullName},\nvaše naročilo ${order.invoiceNumber ?? ''} je bilo odposlano. Kmalu vam bo dostavljeno na navedeni naslov.`,
     }
   }
+  if (type === 'order_ready_for_pickup') {
+    return {
+      eyebrow: 'Naročilo je pripravljeno',
+      heading: 'Naročilo čaka na prevzem!',
+      body: `Spoštovani/-a ${order.fullName},\nvaše naročilo ${order.invoiceNumber ?? ''} je pripravljeno za prevzem. Obiščite nas na dogovorjeni lokaciji.`,
+    }
+  }
   return {
-    eyebrow: 'Naročilo je pripravljeno',
-    heading: 'Naročilo čaka na prevzem!',
-    body: `Spoštovani/-a ${order.fullName},\nvaše naročilo ${order.invoiceNumber ?? ''} je pripravljeno za prevzem. Obiščite nas na dogovorjeni lokaciji.`,
+    eyebrow: 'Naročilo je preklicano',
+    heading: 'Vaše naročilo je bilo preklicano.',
+    body: `Spoštovani/-a ${order.fullName},\nvaše naročilo ${order.invoiceNumber ?? ''} je bilo preklicano. Za dodatne informacije nas kontaktirajte.`,
   }
 }
 
-export function OrderStatusUpdateEmail({ order, type }: Props) {
+export function OrderStatusUpdateEmail({ order, type, shippingOption, pickupLocation }: Props) {
   const { eyebrow, heading, body } = getContent(order, type)
 
   return (
@@ -121,6 +130,69 @@ export function OrderStatusUpdateEmail({ order, type }: Props) {
                         }}>
                           {body}
                         </p>
+
+                        {/* Delivery details */}
+                        {type === 'order_shipped' && (order.address || shippingOption) && (
+                          <table width="100%" cellPadding="0" cellSpacing="0" role="presentation"
+                            className="dark-panel"
+                            style={{
+                              backgroundColor: PANEL,
+                              border: `1px solid ${BORDER}`,
+                              marginBottom: '16px',
+                            }}>
+                            <tbody>
+                              {shippingOption && (
+                                <tr>
+                                  <td style={{ padding: '14px 24px 0 24px' }}>
+                                    <span style={{ fontFamily: MONO_FONT, fontSize: '11px', color: MUTED, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                      Način dostave
+                                    </span>
+                                    <p style={{ fontFamily: MONO_FONT, fontSize: '14px', color: TEXT, margin: '4px 0 0' }}>
+                                      {shippingOption.name}
+                                    </p>
+                                  </td>
+                                </tr>
+                              )}
+                              {order.address && (
+                                <tr>
+                                  <td style={{ padding: '14px 24px' }}>
+                                    <span style={{ fontFamily: MONO_FONT, fontSize: '11px', color: MUTED, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                      Naslov dostave
+                                    </span>
+                                    <p style={{ fontFamily: MONO_FONT, fontSize: '14px', color: TEXT, margin: '4px 0 0', lineHeight: '1.6' }}>
+                                      {order.address}<br />
+                                      {[order.postalCode, order.city].filter(Boolean).join(' ')}{order.country ? `, ${order.country}` : ''}
+                                    </p>
+                                  </td>
+                                </tr>
+                              )}
+                            </tbody>
+                          </table>
+                        )}
+
+                        {type === 'order_ready_for_pickup' && pickupLocation && (
+                          <table width="100%" cellPadding="0" cellSpacing="0" role="presentation"
+                            className="dark-panel"
+                            style={{
+                              backgroundColor: PANEL,
+                              border: `1px solid ${BORDER}`,
+                              marginBottom: '16px',
+                            }}>
+                            <tbody>
+                              <tr>
+                                <td style={{ padding: '14px 24px' }}>
+                                  <span style={{ fontFamily: MONO_FONT, fontSize: '11px', color: MUTED, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                                    Lokacija prevzema
+                                  </span>
+                                  <p style={{ fontFamily: MONO_FONT, fontSize: '14px', color: TEXT, margin: '4px 0 0', lineHeight: '1.6' }}>
+                                    {pickupLocation.name}<br />
+                                    {pickupLocation.address}, {pickupLocation.city}
+                                  </p>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        )}
 
                         {/* Status badge */}
                         {order.invoiceNumber && (

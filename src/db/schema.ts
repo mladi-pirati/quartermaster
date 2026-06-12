@@ -100,6 +100,7 @@ export const orders = pgTable('orders', {
   invoiceNumber: text('invoice_number'),
   invoiceIssuedAt: timestamp('invoice_issued_at'),
   invoiceDueAt: timestamp('invoice_due_at'),
+  racunIssuedAt: timestamp('racun_issued_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at')
     .defaultNow()
@@ -134,6 +135,7 @@ export const emailTypeEnum = pgEnum('email_type', [
   'order_confirmation',
   'order_shipped',
   'order_ready_for_pickup',
+  'order_cancelled',
 ])
 
 export const emailStatusEnum = pgEnum('email_status', ['sent', 'failed'])

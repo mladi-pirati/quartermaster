@@ -34,3 +34,15 @@ export async function retryOrderEmail(
   revalidatePath(`/admin/orders/${order.id}`)
   return { success: true }
 }
+
+// DEBUG: resend confirmation email for any order directly from the orders list
+export async function debugResendConfirmation(
+  orderId: string,
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    await sendOrderConfirmationEmail(orderId)
+    return { success: true }
+  } catch (err) {
+    return { success: false, error: String(err) }
+  }
+}

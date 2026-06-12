@@ -79,6 +79,10 @@ export default async function OrderDetailPage({
           <span className="sr-only">Back</span>
         </Button>
         <h1 className="text-xl font-semibold">Order {order.id.slice(0, 8)}…</h1>
+        <Button variant="default" size="sm" render={<a href={`/api/admin/orders/${order.id}/racun`} target="_blank" rel="noopener noreferrer" />} nativeButton={false}>
+          <FileTextIcon />
+          Račun
+        </Button>
         <Button variant="outline" size="sm" render={<a href={`/api/admin/orders/${order.id}/predracun`} target="_blank" rel="noopener noreferrer" />} nativeButton={false}>
           <FileTextIcon />
           Predračun
