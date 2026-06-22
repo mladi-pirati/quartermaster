@@ -1,0 +1,1 @@
+ALTER TYPE "public"."email_type" ADD VALUE 'predracun_reminder';

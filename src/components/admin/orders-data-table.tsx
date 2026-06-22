@@ -2,9 +2,11 @@
 
 import { useRef, useState } from 'react'
 import {
+  RowSelectionState,
   SortingState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
@@ -17,7 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { Button } from '@/components/ui/button'
 import { ordersColumns } from './orders-columns'
+import { BulkPredracunDialog } from './bulk-predracun-dialog'
 import type { Order } from '@/db/schema'
 
 interface OrdersDataTableProps {
@@ -26,17 +30,24 @@ interface OrdersDataTableProps {
 
 export function OrdersDataTable({ data }: OrdersDataTableProps) {
   const [sorting, setSorting] = useState<SortingState>([])
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [dialogOpen, setDialogOpen] = useState(false)
 
   const table = useReactTable({
     data,
     columns: ordersColumns,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
-    state: { sorting },
+    onRowSelectionChange: setRowSelection,
+    enableRowSelection: true,
+    state: { sorting, rowSelection },
   })
 
   const rows = table.getRowModel().rows
+  const selectedRows = table.getFilteredSelectedRowModel().rows
+  const selectedOrderIds = selectedRows.map((r) => r.original.id)
 
   const parentRef = useRef<HTMLDivElement>(null)
   const rowVirtualizer = useVirtualizer({
@@ -51,6 +62,29 @@ export function OrdersDataTable({ data }: OrdersDataTableProps) {
 
   return (
     <div className="flex h-full flex-col gap-2">
+      {selectedOrderIds.length > 0 && (
+        <div className="flex shrink-0 items-center gap-3 rounded-md border bg-muted/40 px-4 py-2">
+          <span className="text-sm text-muted-foreground">
+            {selectedOrderIds.length}{' '}
+            {selectedOrderIds.length === 1 ? 'naročilo izbrano' : 'naročil izbranih'}
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => setDialogOpen(true)}
+          >
+            Pošlji popravljen predračun
+          </Button>
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => table.resetRowSelection()}
+          >
+            Prekliči izbor
+          </Button>
+        </div>
+      )}
+
       <div
         ref={parentRef}
         className="flex-1 min-h-0 overflow-auto rounded-md border"
@@ -89,7 +123,11 @@ export function OrdersDataTable({ data }: OrdersDataTableProps) {
                 {virtualItems.map((virtualRow) => {
                   const row = rows[virtualRow.index]
                   return (
-                    <TableRow key={row.id} className="cursor-pointer">
+                    <TableRow
+                      key={row.id}
+                      className="cursor-pointer"
+                      data-state={row.getIsSelected() ? 'selected' : undefined}
+                    >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -111,9 +149,17 @@ export function OrdersDataTable({ data }: OrdersDataTableProps) {
           </TableBody>
         </Table>
       </div>
+
       <p className="text-xs text-muted-foreground">
         {rows.length} {rows.length === 1 ? 'order' : 'orders'}
       </p>
+
+      <BulkPredracunDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        orderIds={selectedOrderIds}
+        onSuccess={() => table.resetRowSelection()}
+      />
     </div>
   )
 }

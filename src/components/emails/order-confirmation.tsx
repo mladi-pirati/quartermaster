@@ -40,7 +40,7 @@ export function OrderConfirmationEmail({
     ['Datum izdaje', format(issueDate, 'd. M. yyyy')],
     ['Rok plačila', format(dueDate, 'd. M. yyyy')],
     ['IBAN', 'SI56 0400 1004 6962 927'],
-    ['Sklic', `SI00 ${invoiceNumber}`],
+    ['Sklic', `SI00 ${invoiceNumber.replace(/\D/g, '')}`],
   ]
 
   return (

@@ -46,7 +46,7 @@ export async function generateUpnQrDataUrl(input: UpnQrInput): Promise<string> {
 
   const amountStr = amountEurocents.toString().padStart(11, '0')
   const dueDateStr = format(dueDate, 'dd.MM.yyyy')
-  const reference = `SI00${invoiceNumber}`
+  const reference = `SI00${invoiceNumber.replace(/\D/g, '')}`
   const purpose = `Predracun ${invoiceNumber}`
 
   // Fields 1–19 (each followed by \n in the final string)

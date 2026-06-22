@@ -14,6 +14,7 @@ const TYPE_LABELS: Record<EmailLog['type'], string> = {
   order_shipped: 'Obvestilo o odpremi',
   order_ready_for_pickup: 'Obvestilo o prevzemu',
   order_cancelled: 'Obvestilo o preklicu',
+  predracun_reminder: 'Popravljen predračun',
 }
 
 interface Props {

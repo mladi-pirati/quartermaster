@@ -136,6 +136,7 @@ export const emailTypeEnum = pgEnum('email_type', [
   'order_shipped',
   'order_ready_for_pickup',
   'order_cancelled',
+  'predracun_reminder',
 ])
 
 export const emailStatusEnum = pgEnum('email_status', ['sent', 'failed'])

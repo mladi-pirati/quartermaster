@@ -31,7 +31,7 @@ export async function generatePredracunBuffer(orderId: string): Promise<Buffer> 
             set: { lastNumber: sql`${invoiceCounters.lastNumber} + 1` },
           })
           .returning({ lastNumber: invoiceCounters.lastNumber })
-        number = `QM-${String(counter.lastNumber).padStart(3, '0')}-${year}`
+        number = `${String(counter.lastNumber).padStart(3, '0')}-${year}`
       }
       const issued = issueDate ?? localNoonUtc(order.createdAt)
       const due = dueDate ?? addDays(issued, 8)

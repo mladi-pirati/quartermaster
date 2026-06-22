@@ -207,6 +207,8 @@ export function PredracunDocument({
       ? `${order.address}\n${order.postalCode} ${order.city}\n${order.country}`
       : ''
 
+  const sklicDigits = invoiceNumber.replace(/\D/g, '')
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>
@@ -317,7 +319,7 @@ export function PredracunDocument({
         {/* Payment info */}
         <Text style={styles.paymentLabel}>Informacije za plačilo</Text>
         <Text style={styles.paymentLine}>
-          Sklic: <Text style={styles.paymentBold}>SI00 {invoiceNumber}</Text>
+          Sklic: <Text style={styles.paymentBold}>SI00 {sklicDigits}</Text>
         </Text>
         <Text style={styles.paymentLine}>
           IBAN: <Text style={styles.paymentBold}>SI56 0400 1004 6962 927</Text>{'  '}(OTP banka d.d.)
@@ -346,7 +348,7 @@ export function PredracunDocument({
             </View>
             <View style={styles.qrDetailRow}>
               <Text style={styles.qrDetailLabel}>Sklic</Text>
-              <Text style={styles.qrDetailValue}>SI00 {invoiceNumber}</Text>
+              <Text style={styles.qrDetailValue}>SI00 {sklicDigits}</Text>
             </View>
             <View style={styles.qrDetailRow}>
               <Text style={styles.qrDetailLabel}>Rok plačila</Text>
