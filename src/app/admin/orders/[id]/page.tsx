@@ -21,7 +21,7 @@ import { OrderPaidToggle } from '@/components/admin/order-paid-toggle'
 import { OrderEmailLogs } from '@/components/admin/order-email-logs'
 import { desc, eq } from 'drizzle-orm'
 import { notFound } from 'next/navigation'
-import { formatPrice } from '@/lib/format'
+import { formatPaymentReference, formatPrice } from '@/lib/format'
 import Link from 'next/link'
 import { ArrowLeftIcon, FileTextIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -160,6 +160,14 @@ export default async function OrderDetailPage({
         <div className="flex flex-col gap-3">
           <h2 className="text-sm font-medium text-muted-foreground">Payment</h2>
           <OrderPaidToggle orderId={order.id} isPaid={order.isPaid} />
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+            <dt className="text-muted-foreground">Predračun / račun</dt>
+            <dd className="font-mono">{order.invoiceNumber ?? '—'}</dd>
+            <dt className="text-muted-foreground">Sklic</dt>
+            <dd className="font-mono">
+              {order.invoiceNumber ? formatPaymentReference(order.invoiceNumber) : '—'}
+            </dd>
+          </dl>
         </div>
 
         {/* Notes */}

@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import type { Order } from '@/db/schema'
+import { formatPaymentReference } from '@/lib/format'
 
 type OrderStatus = 'pending' | 'preparing' | 'shipped' | 'ready_for_pickup' | 'complete' | 'cancelled'
 
@@ -86,6 +87,26 @@ export const ordersColumns: ColumnDef<Order>[] = [
         <div className="text-xs text-muted-foreground">{row.original.email}</div>
       </Link>
     ),
+  },
+  {
+    accessorKey: 'invoiceNumber',
+    header: ({ column }) => <SortableHeader column={column} label="Predračun / račun" />,
+    cell: ({ row }) => {
+      const invoiceNumber = row.original.invoiceNumber
+
+      if (!invoiceNumber) {
+        return <span className="text-muted-foreground">—</span>
+      }
+
+      return (
+        <div className="flex flex-col font-mono text-xs">
+          <span>{invoiceNumber}</span>
+          <span className="text-muted-foreground">
+            Sklic: {formatPaymentReference(invoiceNumber)}
+          </span>
+        </div>
+      )
+    },
   },
   {
     accessorKey: 'deliveryType',
