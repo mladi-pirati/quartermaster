@@ -30,7 +30,7 @@ function getContent(order: Order, type: EmailType) {
     return {
       eyebrow: 'Naročilo je pripravljeno',
       heading: 'Naročilo čaka na prevzem!',
-      body: `Spoštovani/-a ${order.fullName},\nvaše naročilo ${order.invoiceNumber ?? ''} je pripravljeno za prevzem. Obiščite nas na dogovorjeni lokaciji.`,
+      body: `Spoštovani/-a ${order.fullName},\nvaše naročilo ${order.invoiceNumber ?? ''} je pripravljeno za prevzem. Obiščite nas na dogovorjeni lokaciji vsak torek med 18:00 in 19:00, vsako sredo med 17:00 in 18:00, ali pa po predhodnem dogovoru.`,
     }
   }
   return {
