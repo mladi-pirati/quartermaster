@@ -1,12 +1,20 @@
 'use client'
 
 import { Column, ColumnDef } from '@tanstack/react-table'
-import { ArrowUpDown } from 'lucide-react'
+import { ArrowUpDown, FunnelIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import type { Order } from '@/db/schema'
 import { formatPaymentReference } from '@/lib/format'
 
@@ -41,6 +49,54 @@ function SortableHeader({ column, label }: { column: Column<Order, unknown>; lab
       {label}
       <ArrowUpDown className="ml-2 h-3.5 w-3.5" />
     </Button>
+  )
+}
+
+function PaymentHeader({ column }: { column: Column<Order, unknown> }) {
+  const filterValue = column.getFilterValue()
+  const value = filterValue === true ? 'paid' : filterValue === false ? 'unpaid' : 'all'
+  const isFiltered = value !== 'all'
+
+  function handleChange(next: string) {
+    column.setFilterValue(next === 'paid' ? true : next === 'unpaid' ? false : undefined)
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <span>Payment</span>
+      <DropdownMenu>
+        <DropdownMenuTrigger
+          render={
+            <Button
+              variant="ghost"
+              size="icon-xs"
+              aria-label={
+                isFiltered
+                  ? `Payment filter: ${value}. Change filter`
+                  : 'Filter orders by payment status'
+              }
+              className={isFiltered ? 'bg-primary/10 text-primary hover:bg-primary/15' : 'text-muted-foreground'}
+            />
+          }
+        >
+          <FunnelIcon />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="start" className="min-w-40">
+          <DropdownMenuRadioGroup value={value} onValueChange={handleChange}>
+            <DropdownMenuLabel>Payment status</DropdownMenuLabel>
+            <DropdownMenuRadioItem value="all" closeOnClick>
+              All orders
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="paid" closeOnClick>
+              Paid
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="unpaid" closeOnClick>
+              Unpaid
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 
@@ -136,7 +192,8 @@ export const ordersColumns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: 'isPaid',
-    header: 'Payment',
+    header: ({ column }) => <PaymentHeader column={column} />,
+    filterFn: (row, columnId, value: boolean) => row.getValue(columnId) === value,
     cell: ({ row }) => (
       <Badge variant={row.original.isPaid ? 'default' : 'secondary'}>
         {row.original.isPaid ? 'Paid' : 'Unpaid'}
