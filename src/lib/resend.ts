@@ -8,8 +8,26 @@ import { OrderConfirmationEmail } from '@/components/emails/order-confirmation'
 import { OrderStatusUpdateEmail } from '@/components/emails/order-status-update'
 import { PredracunReminderEmail } from '@/components/emails/predracun-reminder'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-const FROM = process.env.RESEND_FROM_EMAIL!
+let resend: Resend | undefined
+
+function getResend(): Resend {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) {
+    throw new Error('RESEND_API_KEY is not configured')
+  }
+
+  resend ??= new Resend(apiKey)
+  return resend
+}
+
+function getFromEmail(): string {
+  const from = process.env.RESEND_FROM_EMAIL
+  if (!from) {
+    throw new Error('RESEND_FROM_EMAIL is not configured')
+  }
+
+  return from
+}
 
 async function logEmail(entry: typeof emailLogs.$inferInsert) {
   await db.insert(emailLogs).values(entry)
@@ -40,8 +58,8 @@ export async function sendOrderConfirmationEmail(orderId: string): Promise<void>
   const pdfBuffer = await generatePredracunBuffer(orderId)
   const subject = `Potrditev naročila ${order.invoiceNumber}`
 
-  const { data, error } = await resend.emails.send({
-    from: FROM,
+  const { data, error } = await getResend().emails.send({
+    from: getFromEmail(),
     to: [order.email],
     subject,
     react: OrderConfirmationEmail({
@@ -106,8 +124,8 @@ export async function sendOrderStatusUpdateEmail(
         ? 'Vaše naročilo je pripravljeno za prevzem'
         : 'Vaše naročilo je preklicano'
 
-  const { data, error } = await resend.emails.send({
-    from: FROM,
+  const { data, error } = await getResend().emails.send({
+    from: getFromEmail(),
     to: [order.email],
     subject,
     react: OrderStatusUpdateEmail({ order, type, shippingOption, pickupLocation }),
@@ -155,8 +173,8 @@ export async function sendPredracunReminderEmail(orderId: string, customBody: st
 
   const subject = `Mladi Pirati - Popravljen predračun za naročilo ${order.id.slice(0, 8)}`
 
-  const { data, error } = await resend.emails.send({
-    from: FROM,
+  const { data, error } = await getResend().emails.send({
+    from: getFromEmail(),
     to: [order.email],
     subject,
     react: PredracunReminderEmail({

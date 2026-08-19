@@ -54,11 +54,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (account?.provider !== "keycloak") return false;
       try {
         const helm = await getHelm(account.access_token);
-        console.log("[auth] calling helm.user.me()");
         const user = await helm.user.me();
-        console.log("[auth] helm.user.me() response:", JSON.stringify(user, null, 2));
-        return user.applications.some(
-          (a: { keycloakClientId: string }) => a.keycloakClientId === process.env.KEYCLOAK_CLIENT_ID,
+        return user.access.applications.some(
+          (application) =>
+            application.keycloakClientId === process.env.KEYCLOAK_CLIENT_ID,
         );
       } catch (e) {
         console.error("[auth] signIn error:", e);
